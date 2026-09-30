@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 미니 방명록 (Guestbook)
 
-## Getting Started
+Next.js(App Router) + TypeScript + Neon Postgres 기반 방명록. 회원가입/로그인
+없이 누구나 이름·메시지·비밀번호로 글을 남기고, 같은 비밀번호로만 자기 글을
+수정·삭제할 수 있다.
 
-First, run the development server:
+SDD 흐름(`/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` →
+`/code-review`) 참고 문서:
+- [CONTEXT.md](CONTEXT.md) — 용어집
+- [docs/adr/0001](docs/adr/0001-per-entry-password-no-accounts.md) — 계정 없이 글 단위 비밀번호로 권한 증명하는 이유
+- [specs/guestbook-mvp.md](specs/guestbook-mvp.md) — 스펙
+- [specs/guestbook-mvp-tickets.md](specs/guestbook-mvp-tickets.md) — 티켓
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 기능
+- Create: 이름 + 메시지 + 비밀번호(4자 이상)로 작성
+- Read: 최신순 전체 목록
+- Update/Delete: 비밀번호 일치해야만 가능, 틀리면 화면에 에러 표시
+- 비밀번호는 `crypto.scrypt`로 해시해 저장 (평문 저장 안 함)
+- 화면 하단에 개발자 이름·학번 표시 (`lib/config.ts`)
+
+## 실행 방법
+1. Neon Postgres 프로젝트 생성, Connection String 복사
+2. `.env.local` 생성 (`.env.local.example` 참고):
+   ```
+   DATABASE_URL=postgresql://...
+   ```
+3. `npm install`
+4. 테이블 생성: `npm run db:schema` (또는 `db/schema.sql`을 Neon SQL Editor에서 직접 실행)
+5. `npm run dev` → http://localhost:3000
+
+## 검증 스크립트
+서버를 띄운 상태에서: 작성 → 조회 → 틀린 비밀번호 수정(403) → 올바른
+비밀번호 수정 → 틀린 비밀번호 삭제(403) → 올바른 비밀번호 삭제까지
+자동 확인.
 ```
+node scripts/smoke-test.mjs
+```
+배포본을 검사하려면 `BASE_URL=https://<배포주소> node scripts/smoke-test.mjs`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 배포 (Vercel)
+1. GitHub에 push (저장소 이름 `guestbook-202204182`, **Public**)
+2. vercel.com에서 Import, 프로젝트 이름도 `guestbook-202204182`
+3. Environment Variables에 `DATABASE_URL` 등록
+4. Deploy
