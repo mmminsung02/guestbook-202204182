@@ -77,7 +77,9 @@ export default function EntryCard({ entry }: { entry: Entry }) {
       <div className={styles.header}>
         <strong>{entry.name}</strong>
         <span className={styles.time}>
-          {new Date(entry.created_at).toLocaleString("ko-KR")}
+          {new Date(entry.created_at).toLocaleString("ko-KR", {
+            timeZone: "Asia/Seoul",
+          })}
           {edited && " (수정됨)"}
         </span>
       </div>
