@@ -36,9 +36,3 @@ SDD 흐름(`/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` 
 node scripts/smoke-test.mjs
 ```
 배포본을 검사하려면 `BASE_URL=https://<배포주소> node scripts/smoke-test.mjs`.
-
-## 배포 (Vercel)
-1. GitHub에 push (저장소 이름 `guestbook-202204182`, **Public**)
-2. vercel.com에서 Import, 프로젝트 이름도 `guestbook-202204182`
-3. Environment Variables에 `DATABASE_URL` 등록
-4. Deploy
